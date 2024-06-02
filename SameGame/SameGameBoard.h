@@ -17,9 +17,25 @@ public:
 	int GetRows(void) const { return m_nRows; }
 
 	void DeleteBoard(void);
+	
+	bool IsGameOver(void) const;
+
+	int GetRemainingCount(void) const { return m_nRemaining; };
+
+	int DeleteBlocks(int row, int col);
 
 private: 
 	void CreateBoard(void);
+
+	enum Direction {
+		DIRECTION_UP,
+		DIRECTION_DOWN,
+		DIRECTION_LEFT,
+		DIRECTION_RIGHT
+	};
+
+	int DeleteNeighborBlocks(int row, int col, int color, Direction direction);
+	void CompactBoard(void);
 
 	int** m_arrBoard;
 
@@ -29,6 +45,7 @@ private:
 	int m_nRows;
 	int m_nHeight;
 	int m_nWidth;
+	int m_nRemaining;
 };
 
 #endif

@@ -23,6 +23,8 @@
 IMPLEMENT_DYNCREATE(CSameGameView, CView)
 
 BEGIN_MESSAGE_MAP(CSameGameView, CView)
+//	ON_WM_MBUTTONDOWN()
+ON_WM_LBUTTONDOWN()
 END_MESSAGE_MAP()
 
 // CSameGameView construction/destruction
@@ -47,7 +49,7 @@ BOOL CSameGameView::PreCreateWindow(CREATESTRUCT& cs)
 
 // CSameGameView drawing
 
-void CSameGameView::OnDraw(CDC* /*pDC*/)
+void CSameGameView::OnDraw(CDC* pDC)
 {
 	CSameGameDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
@@ -55,6 +57,36 @@ void CSameGameView::OnDraw(CDC* /*pDC*/)
 		return;
 
 	// TODO: add draw code for native data here
+
+	int nDCSave = pDC->SaveDC();
+
+	CRect rcClient;
+	GetClientRect(&rcClient);
+	COLORREF clr = pDoc->GetBoardSpace(-1, -1);
+
+	pDC->FillSolidRect(&rcClient, clr);
+
+	CBrush br;
+	br.CreateStockObject(HOLLOW_BRUSH);
+	CBrush* pbrOld = pDC->SelectObject(&br);
+
+	for (int row = 0; row < pDoc->GetRows(); row++) {
+		for (int col = 0; col < pDoc->GetColumns(); col++) {
+			clr = pDoc->GetBoardSpace(row, col);
+
+			CRect rcBlock;
+			rcBlock.top = row * pDoc->GetHeight();
+			rcBlock.left = col * pDoc->GetWidth();
+			rcBlock.right = rcBlock.left + pDoc->GetWidth();
+			rcBlock.bottom = rcBlock.top + pDoc->GetHeight();
+
+			pDC->FillSolidRect(&rcBlock, clr);
+
+			pDC->Rectangle(&rcBlock);
+		}
+	}
+	pDC->RestoreDC(nDCSave);
+	br.DeleteObject();
 }
 
 
@@ -78,5 +110,59 @@ CSameGameDoc* CSameGameView::GetDocument() const // non-debug version is inline
 }
 #endif //_DEBUG
 
+void CSameGameView::OnInitialUpdate() {
+	CView::OnInitialUpdate();
+
+	ResizeWindow();
+}
+
+void CSameGameView::ResizeWindow() {
+	CSameGameDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	CRect rcClient, rcWindow;
+	GetClientRect(rcClient);
+	GetParentFrame()->GetWindowRect(&rcWindow);
+	int nWidthDiff = rcWindow.Width() - rcClient.Width();
+	int nHeightDiff = rcWindow.Height() - rcClient.Height();
+
+	rcWindow.right = rcWindow.left + pDoc->GetWidth() * pDoc->GetColumns() + nWidthDiff;
+	rcWindow.bottom = rcWindow.top + pDoc->GetHeight() * pDoc->GetRows() + nHeightDiff;
+
+	GetParentFrame()->MoveWindow(&rcWindow);
+}
+
 
 // CSameGameView message handlers
+
+void CSameGameView::OnLButtonDown(UINT nFlags, CPoint point) {
+	CSameGameDoc* pDoc = GetDocument();
+
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	int row = point.y / pDoc->GetHeight();
+	int col = point.x / pDoc->GetWidth();
+
+	int count = pDoc->DeleteBlocks(row, col);
+
+	if (count > 0) {
+		Invalidate();
+		UpdateWindow();
+
+		if (pDoc->IsGameOver()) {
+			int remaining = pDoc->GetRemainingCount();
+			CString message;
+			message.Format(_T("No more moves left\nBlocks remaining: %d"), remaining);
+
+			MessageBox(message, _T("Game Over"), MB_OK | MB_ICONINFORMATION);
+		}
+	}
+
+	CView::OnLButtonDown(nFlags, point);
+}
+
+
