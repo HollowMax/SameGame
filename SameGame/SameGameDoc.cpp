@@ -31,11 +31,15 @@ END_MESSAGE_MAP()
 CSameGameDoc::CSameGameDoc() noexcept
 {
 	// TODO: add one-time construction code here
-
+	m_board = new CSameGameBoard();
 }
 
 CSameGameDoc::~CSameGameDoc()
 {
+	delete m_board;
+
+	ClearUndo();
+	ClearRedo();
 }
 
 BOOL CSameGameDoc::OnNewDocument()
@@ -46,7 +50,10 @@ BOOL CSameGameDoc::OnNewDocument()
 	// TODO: add reinitialization code here
 	// (SDI documents will reuse this document)
 
-	m_board.SetupBoard();
+	m_board->SetupBoard();
+
+	ClearUndo();
+	ClearRedo();
 
 	return TRUE;
 }
@@ -138,3 +145,65 @@ void CSameGameDoc::Dump(CDumpContext& dc) const
 
 
 // CSameGameDoc commands
+
+
+void CSameGameDoc::SetNumColors(int nColors) {
+	m_board->SetNumColors(nColors);
+
+	m_board->SetupBoard();
+}
+
+int CSameGameDoc::DeleteBlocks(int row, int col) {
+	m_undo.push(new CSameGameBoard(*m_board));
+
+	ClearRedo();
+
+	int blocks = m_board->DeleteBlocks(row, col);
+
+	if (m_board->IsGameOver())
+		ClearUndo();
+
+	return blocks;
+}
+
+void CSameGameDoc::UndoLast() {
+	if (m_undo.empty())
+		return;
+
+	m_redo.push(m_board);
+
+	m_board = m_undo.top();
+	m_undo.pop();
+}
+
+void CSameGameDoc::RedoLast() {
+	if (m_redo.empty())
+		return;
+
+	m_undo.push(m_board);
+
+	m_board = m_redo.top();
+	m_redo.pop();
+}
+
+bool CSameGameDoc::CanUndo() {
+	return !m_undo.empty();
+}
+
+bool CSameGameDoc::CanRedo() {
+	return !m_redo.empty();
+}
+
+void CSameGameDoc::ClearUndo() {
+	while (!m_undo.empty()) {
+		delete m_undo.top();
+		m_undo.pop();
+	}
+}
+
+void CSameGameDoc::ClearRedo() {
+	while (!m_redo.empty()) {
+		delete m_redo.top();
+		m_redo.pop();
+	}
+}

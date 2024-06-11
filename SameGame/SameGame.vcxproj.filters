@@ -57,6 +57,9 @@
     <ClInclude Include="SameGameBoard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="COptionDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SameGame.cpp">
@@ -90,6 +93,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SameGameBoard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="COptionDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

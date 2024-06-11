@@ -140,6 +140,10 @@ protected:
 // Implementation
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedButtonReset();
+//	afx_msg void OnEditUndo();
+//	afx_msg void OnUpdateEditUndo(CCmdUI* pCmdUI);
 };
 
 CAboutDlg::CAboutDlg() noexcept : CDialogEx(IDD_ABOUTBOX)
@@ -152,6 +156,9 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+	ON_BN_CLICKED(IDC_BUTTON_RESET, &CAboutDlg::OnBnClickedButtonReset)
+//	ON_COMMAND(ID_EDIT_UNDO, &CAboutDlg::OnEditUndo)
+//	ON_UPDATE_COMMAND_UI(ID_EDIT_UNDO, &CAboutDlg::OnUpdateEditUndo)
 END_MESSAGE_MAP()
 
 // App command to run the dialog
@@ -165,3 +172,21 @@ void CSameGameApp::OnAppAbout()
 
 
 
+
+
+void CAboutDlg::OnBnClickedButtonReset()
+{
+	// TODO: Add your control notification handler code here
+}
+
+
+//void CAboutDlg::OnEditUndo()
+//{
+//	// TODO: Add your command handler code here
+//}
+
+
+//void CAboutDlg::OnUpdateEditUndo(CCmdUI* pCmdUI)
+//{
+//	// TODO: Add your command update UI handler code here
+//}

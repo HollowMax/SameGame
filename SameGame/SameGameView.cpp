@@ -12,6 +12,7 @@
 
 #include "SameGameDoc.h"
 #include "SameGameView.h"
+#include "COptionDialog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -25,6 +26,22 @@ IMPLEMENT_DYNCREATE(CSameGameView, CView)
 BEGIN_MESSAGE_MAP(CSameGameView, CView)
 //	ON_WM_MBUTTONDOWN()
 ON_WM_LBUTTONDOWN()
+ON_COMMAND(ID_DIFFICULTY_3COLORS, &CSameGameView::OnDifficulty3colors)
+ON_UPDATE_COMMAND_UI(ID_DIFFICULTY_3COLORS, &CSameGameView::OnUpdateDifficulty3colors)
+ON_COMMAND(ID_DIFFICULTY_4COLORS, &CSameGameView::OnDifficulty4colors)
+ON_UPDATE_COMMAND_UI(ID_DIFFICULTY_4COLORS, &CSameGameView::OnUpdateDifficulty4colors)
+ON_COMMAND(ID_DIFFICULTY_5COLORS, &CSameGameView::OnDifficulty5colors)
+ON_UPDATE_COMMAND_UI(ID_DIFFICULTY_5COLORS, &CSameGameView::OnUpdateDifficulty5colors)
+ON_COMMAND(ID_DIFFICULTY_6COLORS, &CSameGameView::OnDifficulty6colors)
+ON_UPDATE_COMMAND_UI(ID_DIFFICULTY_6COLORS, &CSameGameView::OnUpdateDifficulty6colors)
+ON_COMMAND(ID_DIFFICULTY_7COLORS, &CSameGameView::OnDifficulty7colors)
+ON_UPDATE_COMMAND_UI(ID_DIFFICULTY_7COLORS, &CSameGameView::OnUpdateDifficulty7colors)
+ON_COMMAND(ID_SETTINGS_NUMBEROFBLOCKS, &CSameGameView::OnSettingsNumberofblocks)
+ON_COMMAND(ID_SETTINGS_SIZEOFBLOCKS, &CSameGameView::OnSettingsSizeofblocks)
+ON_COMMAND(ID_EDIT_UNDO, &CSameGameView::OnEditUndo)
+ON_UPDATE_COMMAND_UI(ID_EDIT_UNDO, &CSameGameView::OnUpdateEditUndo)
+ON_COMMAND(ID_EDIT_REDO, &CSameGameView::OnEditRedo)
+ON_UPDATE_COMMAND_UI(ID_EDIT_REDO, &CSameGameView::OnUpdateEditRedo)
 END_MESSAGE_MAP()
 
 // CSameGameView construction/destruction
@@ -165,4 +182,188 @@ void CSameGameView::OnLButtonDown(UINT nFlags, CPoint point) {
 	CView::OnLButtonDown(nFlags, point);
 }
 
+void CSameGameView::setColorsCount(int numColors) {
+	CSameGameDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
 
+	pDoc->SetNumColors(numColors);
+
+	Invalidate();
+	UpdateWindow();
+}
+
+void CSameGameView::setColorsCheckmark(int numColors, CCmdUI *pCmdUI) {
+	CSameGameDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	pCmdUI->SetCheck(pDoc->GetNumColors() == numColors);
+}
+
+void CSameGameView::OnDifficulty3colors()
+{
+	setColorsCount(3);
+}
+
+
+void CSameGameView::OnUpdateDifficulty3colors(CCmdUI* pCmdUI)
+{
+	setColorsCheckmark(3, pCmdUI);
+}
+
+
+void CSameGameView::OnDifficulty4colors()
+{
+	setColorsCount(4);
+}
+
+
+void CSameGameView::OnUpdateDifficulty4colors(CCmdUI* pCmdUI)
+{
+	setColorsCheckmark(4, pCmdUI);
+}
+
+
+void CSameGameView::OnDifficulty5colors()
+{
+	setColorsCount(5);
+}
+
+
+void CSameGameView::OnUpdateDifficulty5colors(CCmdUI* pCmdUI)
+{
+	setColorsCheckmark(5, pCmdUI);
+}
+
+
+void CSameGameView::OnDifficulty6colors()
+{
+	setColorsCount(6);
+}
+
+
+void CSameGameView::OnUpdateDifficulty6colors(CCmdUI* pCmdUI)
+{
+	setColorsCheckmark(6, pCmdUI);
+}
+
+
+void CSameGameView::OnDifficulty7colors()
+{
+	setColorsCount(7);
+}
+
+
+void CSameGameView::OnUpdateDifficulty7colors(CCmdUI* pCmdUI)
+{
+	setColorsCheckmark(7, pCmdUI);
+}
+
+
+void CSameGameView::OnSettingsNumberofblocks()
+{
+	// TODO: Add your command handler code here
+	CSameGameDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	COptionDialog dlg(true, this);
+
+	dlg.m_nValue1 = pDoc->GetRows();
+	dlg.m_nValue2 = pDoc->GetColumns();
+
+	if (dlg.DoModal() == IDOK)
+	{
+		pDoc->DeleteBoard();
+
+		pDoc->SetRows(dlg.m_nValue1);
+		pDoc->SetColumns(dlg.m_nValue2);
+
+		pDoc->SetupBoard();
+
+		ResizeWindow();
+	}
+}
+
+
+void CSameGameView::OnSettingsSizeofblocks()
+{
+	// TODO: Add your command handler code here
+	CSameGameDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	COptionDialog dlg(false, this);
+
+	dlg.m_nValue1 = pDoc->GetWidth();
+	dlg.m_nValue2 = pDoc->GetHeight();
+
+	if (dlg.DoModal() == IDOK)
+	{
+		pDoc->DeleteBoard();
+
+		pDoc->SetWidth(dlg.m_nValue1);
+		pDoc->SetHeight(dlg.m_nValue2);
+
+		pDoc->SetupBoard();
+
+		ResizeWindow();
+	}
+}
+
+
+void CSameGameView::OnEditUndo()
+{
+	// TODO: Add your command handler code here
+	CSameGameDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+	pDoc->UndoLast();
+
+	Invalidate();
+	UpdateWindow();
+}
+
+
+void CSameGameView::OnUpdateEditUndo(CCmdUI* pCmdUI)
+{
+	// TODO: Add your command update UI handler code here
+	CSameGameDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	pCmdUI->Enable(pDoc->CanUndo());
+}
+
+
+void CSameGameView::OnEditRedo()
+{
+	// TODO: Add your command handler code here
+	CSameGameDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+	pDoc->RedoLast();
+
+	Invalidate();
+	UpdateWindow();
+}
+
+
+void CSameGameView::OnUpdateEditRedo(CCmdUI* pCmdUI)
+{
+	// TODO: Add your command update UI handler code here
+	CSameGameDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	pCmdUI->Enable(pDoc->CanRedo());
+}

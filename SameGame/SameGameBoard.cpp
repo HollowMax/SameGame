@@ -7,14 +7,39 @@ CSameGameBoard::CSameGameBoard(void)
 	m_nRows(15),
 	m_nHeight(35),
 	m_nWidth(35),
-	m_nRemaining(0)
+	m_nRemaining(0),
+	m_nColors(3)
 {
 	m_arrColors[0] = RGB(0, 0, 0);
 	m_arrColors[1] = RGB(255, 0, 0);
 	m_arrColors[2] = RGB(255, 255, 64);
 	m_arrColors[3] = RGB(0, 0, 255);
+	m_arrColors[4] = RGB(0, 255, 0);
+	m_arrColors[5] = RGB(0, 255, 255);
+	m_arrColors[6] = RGB(255, 0, 128);
+	m_arrColors[7] = RGB(0, 64, 0);
 
 	SetupBoard();
+}
+
+CSameGameBoard::CSameGameBoard(const CSameGameBoard& board)
+{
+	m_nColumns = board.m_nColumns;
+	m_nRows = board.m_nRows;
+	m_nHeight = board.m_nHeight;
+	m_nWidth = board.m_nWidth;
+	m_nRemaining = board.m_nRemaining;
+	m_nColors = board.m_nColors;
+
+	for (int i = 0; i < 8; i++)
+		m_arrColors[i] = board.m_arrColors[i];
+	m_arrBoard = nullptr;
+
+	CreateBoard();
+
+	for (int row = 0; row < m_nRows; row++)
+		for (int col = 0; col < m_nColumns; col++)
+			m_arrBoard[row][col] = board.m_arrBoard[row][col];
 }
 
 CSameGameBoard::~CSameGameBoard(void) {
@@ -27,7 +52,7 @@ void CSameGameBoard::SetupBoard(void){
 
 	for (int row = 0; row < m_nRows; row++)
 		for (int col = 0; col < m_nColumns; col++)
-			m_arrBoard[row][col] = (rand() % 3) + 1;
+			m_arrBoard[row][col] = (rand() % m_nColors) + 1;
 
 	m_nRemaining = m_nRows * m_nColumns;
 }
